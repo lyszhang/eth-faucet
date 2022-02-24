@@ -3,18 +3,21 @@ package chain
 import (
 	"context"
 	"crypto/ecdsa"
-	"math/big"
-
+	"fmt"
+	"github.com/chainflag/eth-faucet/internal/chain/contract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"math/big"
 )
 
 type TxBuilder interface {
 	Sender() common.Address
+	PackTransfer(ctx context.Context, to string, value *big.Int) (common.Hash, error)
 	Transfer(ctx context.Context, to string, value *big.Int) (common.Hash, error)
+	TransferERC20Token(ctx context.Context, to string, value *big.Int) (common.Hash, error)
 }
 
 type TxBuild struct {
@@ -49,6 +52,18 @@ func (b *TxBuild) Sender() common.Address {
 	return b.fromAddress
 }
 
+func (b *TxBuild) PackTransfer(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
+	txHash, err := b.Transfer(ctx, to, value)
+	go func() {
+		txHash, err := b.TransferERC20Token(context.Background(), to, value)
+		if err != nil {
+			fmt.Printf("send ERC20 token failed, err: %s",err.Error())
+		}
+		fmt.Println("send ERC20 tx hash: ", txHash.String())
+	}()
+	return txHash, err
+}
+
 func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
 	nonce, err := b.client.PendingNonceAt(ctx, b.Sender())
 	if err != nil {
@@ -68,6 +83,47 @@ func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (comm
 		Value:    value,
 		Gas:      gasLimit,
 		GasPrice: gasPrice,
+	})
+
+	signedTx, err := types.SignTx(unsignedTx, b.signer, b.privateKey)
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	return signedTx.Hash(), b.client.SendTransaction(ctx, signedTx)
+}
+
+func (b *TxBuild) TransferERC20Token(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
+	nonce, err := b.client.PendingNonceAt(ctx, b.Sender())
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	gasLimit := uint64(860000)
+	gasPrice, err := b.client.SuggestGasPrice(ctx)
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	// token transfer data
+	ctrJson, _ := contract.Asset("TetherToken.json")
+	ctr, err := newTokenContract(getTokenContractAddress(), ctrJson)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	txData, err := ctr.PackTransfer(common.HexToAddress(to), big.NewInt(100*1000))
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	// tx
+	unsignedTx := types.NewTx(&types.LegacyTx{
+		Nonce:    nonce,
+		To:       &ctr.address,
+		Value:    value,
+		Gas:      gasLimit,
+		GasPrice: gasPrice,
+		Data: txData,
 	})
 
 	signedTx, err := types.SignTx(unsignedTx, b.signer, b.privateKey)

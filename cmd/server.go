@@ -26,7 +26,7 @@ var (
 	chainNameFlag = flag.String("chainname", "testnet", "Network name to display on the frontend")
 	httpPortFlag  = flag.Int("httpport", 8080, "Listener port to serve HTTP connection")
 	intervalFlag  = flag.Int("interval", 1440, "Number of minutes to wait between funding rounds")
-	payoutFlag    = flag.Int("payout", 1, "Number of Ethers to transfer per user request")
+	payoutFlag    = flag.Int("payout", 10, "Number of Ethers to transfer per user request")
 	proxyCntFlag  = flag.Int("proxycount", 0, "Count of reverse proxies in front of the server")
 	queueCapFlag  = flag.Int("queuecap", 100, "Maximum transactions waiting to be sent")
 	versionFlag   = flag.Bool("v", false, "Print version number")

@@ -2,6 +2,7 @@ package chain
 
 import (
 	"math/big"
+	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -16,4 +17,8 @@ func IsValidAddress(address string, checksummed bool) bool {
 func EtherToWei(amount int64) *big.Int {
 	ether := new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
 	return new(big.Int).Mul(big.NewInt(amount), ether)
+}
+
+func getTokenContractAddress() string{
+	return os.Getenv("LCNY_CONTRACT")
 }

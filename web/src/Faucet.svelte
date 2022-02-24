@@ -86,7 +86,7 @@
       <div class="container has-text-centered">
         <div class="column is-6 is-offset-3">
           <h1 class="title">
-            Receive {faucetInfo.payout} GKII per request
+            Receive {faucetInfo.payout} GKII && 100 LCNY per request
           </h1>
           <h2 class="subtitle">
             Serving from {faucetInfo.account}
