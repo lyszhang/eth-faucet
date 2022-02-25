@@ -43,7 +43,7 @@ func NewTxBuilder(provider string, privateKey *ecdsa.PrivateKey, chainID *big.In
 	return &TxBuild{
 		client:      client,
 		privateKey:  privateKey,
-		signer:      types.NewEIP155Signer(chainID),
+		signer:      types.NewEIP2930Signer(chainID),
 		fromAddress: crypto.PubkeyToAddress(privateKey.PublicKey),
 	}, nil
 }
@@ -117,7 +117,8 @@ func (b *TxBuild) TransferERC20Token(ctx context.Context, to string, value *big.
 	}
 
 	// tx
-	unsignedTx := types.NewTx(&types.LegacyTx{
+	unsignedTx := types.NewTx(&types.AccessListTx{
+		ChainID: b.signer.ChainID(),
 		Nonce:    nonce,
 		To:       &ctr.address,
 		Gas:      gasLimit,
