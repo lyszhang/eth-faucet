@@ -120,7 +120,6 @@ func (b *TxBuild) TransferERC20Token(ctx context.Context, to string, value *big.
 	unsignedTx := types.NewTx(&types.LegacyTx{
 		Nonce:    nonce,
 		To:       &ctr.address,
-		Value:    value,
 		Gas:      gasLimit,
 		GasPrice: gasPrice,
 		Data: txData,
