@@ -1,5 +1,19 @@
 # eth-faucet
+
+[![Build](https://github.com/scroll-dev/eth-faucet/workflows/Go/badge.svg)](https://github.com/scroll-dev/eth-faucet/actions?query=workflow%3AGo)
+[![Release](https://img.shields.io/github/v/release/scroll-dev/eth-faucet)](https://github.com/scroll-dev/eth-faucet/releases)
+[![Report](https://goreportcard.com/badge/github.com/scroll-dev/eth-faucet)](https://goreportcard.com/report/github.com/scroll-dev/eth-faucet)
+[![Go](https://img.shields.io/github/go-mod/go-version/scroll-dev/eth-faucet)](https://go.dev/)
+[![License](https://img.shields.io/github/license/scroll-dev/eth-faucet)](https://github.com/scroll-dev/eth-faucet/blob/main/LICENSE)
+
 The faucet is a web application with the goal of distributing small amounts of Ether in private and test networks.
+
+## Features
+
+* Allow to configure the funding account via private key or keystore
+* Asynchronous processing Txs to achieve parallel execution of user requests
+* Rate limiting by ETH address and IP address as a precaution against spam
+* Prevent X-Forwarded-For spoofing by specifying the count of reverse proxies
 
 ## Get started
 
@@ -12,7 +26,7 @@ The faucet is a web application with the goal of distributing small amounts of E
 
 1. Clone the repository and navigate to the app’s directory
 ```bash
-git clone https://github.com/chainflag/eth-faucet.git
+git clone https://github.com/scroll-dev/eth-faucet.git
 cd eth-faucet
 ```
 
@@ -28,38 +42,62 @@ go build -o eth-faucet
 
 ## Usage
 
-1. Set up Web3 Provider and Private Key
+**Use private key to fund users**
+
 ```bash
-export WEB3_PROVIDER="rpc endpoint"
-export PRIVATE_KEY="hex private key"
+./eth-faucet -httpport 8080 -wallet.provider http://localhost:8545 -wallet.privkey privkey
 ```
 
-2. Run the eth faucet application
+**Use keystore to fund users**
+
+```bash
+./eth-faucet -httpport 8080 -wallet.provider http://localhost:8545 -wallet.keyjson keystore -wallet.keypass password.txt
+```
+
+### Configuration
+
+You can configure the funder by using environment variables instead of command-line flags as follows:
+```bash
+export WEB3_PROVIDER=rpc endpoint
+export PRIVATE_KEY=hex private key
+```
+
+or
+
+```bash
+export WEB3_PROVIDER=rpc endpoint
+export KEYSTORE=keystore path
+echo "your keystore password" > `pwd`/password.txt
+```
+
+Then run the faucet application without the wallet command-line flags:
 ```bash
 ./eth-faucet -httpport 8080
 ```
 
 **Optional Flags**
 
-| Flag        | Description                                      | Default Value
-| ----------- | ------------------------------------------------ | -------------
-| -chainname  | Network name to display on the frontend          | testnet
-| -httpport   | Listener port to serve HTTP connection           | 8080
-| -interval   | Number of minutes to wait between funding rounds | 1440
-| -payout     | Number of Ethers to transfer per user request    | 1
-| -proxycount | Count of reverse proxies in front of the server  | 0
-| -queuecap   | Maximum transactions waiting to be sent          | 100
+The following are the available command-line flags(excluding above wallet flags):
+
+| Flag           | Description                                      | Default Value
+| -------------- | ------------------------------------------------ | -------------
+| -httpport      | Listener port to serve HTTP connection           | 8080
+| -proxycount    | Count of reverse proxies in front of the server  | 0
+| -queuecap      | Maximum transactions waiting to be sent          | 100
+| -faucet.amount | Number of Ethers to transfer per user request    | 1
+| -faucet.minutes| Number of minutes to wait between funding rounds | 1440
+| -faucet.name   | Network name to display on the frontend          | testnet
 
 ### Docker deployment
 
-* Use private key as sender
 ```bash
-docker run -d -p 8080:8080 -e WEB3_PROVIDER="rpc endpoint" -e PRIVATE_KEY="hex private key" chainflag/eth-faucet:1.0.0
+docker run -d -p 8080:8080 -e WEB3_PROVIDER=rpc endpoint -e PRIVATE_KEY=hex private key scrolltech/eth-faucet
 ```
 
-* Use keystore file as sender
+or
+
 ```bash
-docker run -d -p 8080:8080 -e WEB3_PROVIDER="rpc endpoint" -e KEYSTORE="keystore path" -v `pwd`/keystore:/app/keystore -v `pwd`/password.txt:/app/password.txt chainflag/eth-faucet:1.0.0
+docker run -d -p 8080:8080 -e WEB3_PROVIDER=rpc endpoint -e KEYSTORE=keystore path -v `pwd`/keystore:/app/keystore -v `pwd`/password.txt:/app/password.txt scrolltech/eth-faucet
 ```
 
 ### Heroku deployment
@@ -78,6 +116,8 @@ or
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
+> tip: Free web dyno goes to sleep and discards in-memory rate limiting records after 30 minutes of inactivity, so `faucet.minutes` configuration greater than 30 doesn't work properly in the free Heroku plan.
+
 ## License
 
-Distributed under the MIT License. See LICENSE.txt for more information.
+Distributed under the MIT License. See LICENSE for more information.

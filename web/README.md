@@ -1,6 +1,6 @@
 # eth-faucet-web
 
-This is the Frontend of [eth-faucet](https://github.com/chainflag/eth-faucet) built with https://github.com/sveltejs/template.
+This is the Frontend of [eth-faucet](https://github.com/scroll-dev/eth-faucet) built with https://github.com/sveltejs/template.
 
 ## Get started
 

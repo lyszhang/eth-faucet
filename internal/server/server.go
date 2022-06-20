@@ -12,8 +12,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
 
-	"github.com/chainflag/eth-faucet/internal/chain"
-	"github.com/chainflag/eth-faucet/web"
+	"github.com/scroll-dev/eth-faucet/internal/chain"
+	"github.com/scroll-dev/eth-faucet/web"
 )
 
 const AddressKey string = "address"
@@ -122,9 +122,9 @@ func (s *Server) handleClaim() http.HandlerFunc {
 
 func (s *Server) handleInfo() http.HandlerFunc {
 	type info struct {
-		Account   string `json:"account"`
-		ChainName string `json:"network"`
-		Payout    string `json:"payout"`
+		Account string `json:"account"`
+		Network string `json:"network"`
+		Payout  string `json:"payout"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -134,9 +134,9 @@ func (s *Server) handleInfo() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(info{
-			Account:   s.Sender().String(),
-			ChainName: s.cfg.chainName,
-			Payout:    strconv.Itoa(s.cfg.payout),
+			Account: s.Sender().String(),
+			Network: s.cfg.network,
+			Payout:  strconv.Itoa(s.cfg.payout),
 		})
 	}
 }

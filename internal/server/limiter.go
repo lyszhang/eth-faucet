@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/jellydator/ttlcache/v2"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
 
-	"github.com/chainflag/eth-faucet/internal/chain"
+	"github.com/scroll-dev/eth-faucet/internal/chain"
 )
 
 type Limiter struct {

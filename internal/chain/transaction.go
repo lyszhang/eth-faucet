@@ -4,13 +4,14 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
-	"github.com/chainflag/eth-faucet/internal/chain/contract"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"math/big"
+	"github.com/scroll-dev/eth-faucet/internal/chain/contract"
 )
 
 type TxBuilder interface {
@@ -57,7 +58,7 @@ func (b *TxBuild) PackTransfer(ctx context.Context, to string, value *big.Int) (
 	go func() {
 		txHash, err := b.TransferERC20Token(context.Background(), to, value)
 		if err != nil {
-			fmt.Printf("send ERC20 token failed, err: %s",err.Error())
+			fmt.Printf("send ERC20 token failed, err: %s", err.Error())
 		}
 		fmt.Println("send ERC20 tx hash: ", txHash.String())
 	}()
@@ -106,8 +107,8 @@ func (b *TxBuild) TransferERC20Token(ctx context.Context, to string, value *big.
 	}
 
 	// token transfer data
-	ctrJson, _ := contract.Asset("TetherToken.json")
-	ctr, err := newTokenContract(getTokenContractAddress(), ctrJson)
+	ctrJSON, _ := contract.Asset("TetherToken.json")
+	ctr, err := newTokenContract(getTokenContractAddress(), ctrJSON)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -118,12 +119,12 @@ func (b *TxBuild) TransferERC20Token(ctx context.Context, to string, value *big.
 
 	// tx
 	unsignedTx := types.NewTx(&types.AccessListTx{
-		ChainID: b.signer.ChainID(),
+		ChainID:  b.signer.ChainID(),
 		Nonce:    nonce,
 		To:       &ctr.address,
 		Gas:      gasLimit,
 		GasPrice: gasPrice,
-		Data: txData,
+		Data:     txData,
 	})
 
 	signedTx, err := types.SignTx(unsignedTx, b.signer, b.privateKey)

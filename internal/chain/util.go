@@ -19,6 +19,6 @@ func EtherToWei(amount int64) *big.Int {
 	return new(big.Int).Mul(big.NewInt(amount), ether)
 }
 
-func getTokenContractAddress() string{
-	return os.Getenv("LCNY_CONTRACT")
+func getTokenContractAddress() string {
+	return os.Getenv("USDC_CONTRACT")
 }
