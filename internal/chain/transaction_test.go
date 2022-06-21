@@ -3,15 +3,14 @@ package chain
 import (
 	"context"
 	"math/big"
-	"reflect"
 	"testing"
 
-	"github.com/agiledragon/gomonkey/v2"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTxBuilder(t *testing.T) {
@@ -23,17 +22,13 @@ func TestTxBuilder(t *testing.T) {
 		}, 10000000,
 	)
 	defer simClient.Close()
-	var s *backends.SimulatedBackend
-	patches := gomonkey.ApplyMethod(reflect.TypeOf(s), "SuggestGasPrice", func(_ *backends.SimulatedBackend, _ context.Context) (*big.Int, error) {
-		return big.NewInt(875000000), nil
-	})
-	defer patches.Reset()
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, simClient.Blockchain().Config().ChainID)
+	assert.NoError(t, err)
 
 	txBuilder := &TxBuild{
-		client:      simClient,
-		privateKey:  privateKey,
-		signer:      types.NewEIP155Signer(big.NewInt(1337)),
-		fromAddress: crypto.PubkeyToAddress(privateKey.PublicKey),
+		client:  simClient,
+		chainID: simClient.Blockchain().Config().ChainID,
+		auth:    auth,
 	}
 	bgCtx := context.Background()
 	toAddress := common.HexToAddress("0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B")
