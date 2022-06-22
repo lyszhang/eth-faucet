@@ -9,8 +9,9 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/scroll-dev/eth-faucet/internal/chain/contract"
 )
 
@@ -22,10 +23,12 @@ type TxBuilder interface {
 }
 
 type TxBuild struct {
-	client      bind.ContractTransactor
-	privateKey  *ecdsa.PrivateKey
-	signer      types.Signer
-	fromAddress common.Address
+	client  bind.ContractTransactor
+	chainID *big.Int
+
+	tokenAddr common.Address
+	auth      *bind.TransactOpts
+	token     *contract.ERC20BurnableMockSession
 }
 
 func NewTxBuilder(provider string, privateKey *ecdsa.PrivateKey, chainID *big.Int) (TxBuilder, error) {
@@ -41,16 +44,33 @@ func NewTxBuilder(provider string, privateKey *ecdsa.PrivateKey, chainID *big.In
 		}
 	}
 
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+	if err != nil {
+		return nil, err
+	}
+	tokenAddr, tx, token, err := contract.DeployERC20BurnableMock(auth, client, "USDC coin", "USDC", auth.From, big.NewInt(0).Mul(big.NewInt(1e6), big.NewInt(1e18)))
+	if err != nil {
+		return nil, err
+	}
+	waitPendingTx(context.Background(), client, tx.Hash())
+	log.Infof("Deploy erc20 contract %s successful", tokenAddr.String())
+
 	return &TxBuild{
-		client:      client,
-		privateKey:  privateKey,
-		signer:      types.NewEIP2930Signer(chainID),
-		fromAddress: crypto.PubkeyToAddress(privateKey.PublicKey),
+		client:    client,
+		auth:      auth,
+		tokenAddr: tokenAddr,
+		token: &contract.ERC20BurnableMockSession{
+			Contract: token,
+			CallOpts: bind.CallOpts{
+				Pending: true,
+			},
+			TransactOpts: *auth,
+		},
 	}, nil
 }
 
 func (b *TxBuild) Sender() common.Address {
-	return b.fromAddress
+	return b.auth.From
 }
 
 func (b *TxBuild) PackTransfer(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
@@ -86,7 +106,7 @@ func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (comm
 		GasPrice: gasPrice,
 	})
 
-	signedTx, err := types.SignTx(unsignedTx, b.signer, b.privateKey)
+	signedTx, err := b.auth.Signer(b.auth.From, unsignedTx)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -95,42 +115,9 @@ func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (comm
 }
 
 func (b *TxBuild) TransferERC20Token(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
-	nonce, err := b.client.PendingNonceAt(ctx, b.Sender())
+	tx, err := b.token.Transfer(common.HexToAddress(to), big.NewInt(0).Mul(big.NewInt(100), value))
 	if err != nil {
 		return common.Hash{}, err
 	}
-
-	gasLimit := uint64(860000)
-	gasPrice, err := b.client.SuggestGasPrice(ctx)
-	if err != nil {
-		return common.Hash{}, err
-	}
-
-	// token transfer data
-	ctrJSON, _ := contract.Asset("TetherToken.json")
-	ctr, err := newTokenContract(getTokenContractAddress(), ctrJSON)
-	if err != nil {
-		return common.Hash{}, err
-	}
-	txData, err := ctr.PackTransfer(common.HexToAddress(to), big.NewInt(100*1000))
-	if err != nil {
-		return common.Hash{}, err
-	}
-
-	// tx
-	unsignedTx := types.NewTx(&types.AccessListTx{
-		ChainID:  b.signer.ChainID(),
-		Nonce:    nonce,
-		To:       &ctr.address,
-		Gas:      gasLimit,
-		GasPrice: gasPrice,
-		Data:     txData,
-	})
-
-	signedTx, err := types.SignTx(unsignedTx, b.signer, b.privateKey)
-	if err != nil {
-		return common.Hash{}, err
-	}
-
-	return signedTx.Hash(), b.client.SendTransaction(ctx, signedTx)
+	return tx.Hash(), nil
 }
