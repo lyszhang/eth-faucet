@@ -25,9 +25,10 @@ var (
 	queueCapFlag = flag.Int("queuecap", 100, "Maximum transactions waiting to be sent")
 	versionFlag  = flag.Bool("version", false, "Print version number")
 
-	payoutFlag   = flag.Int("faucet.amount", 1, "Number of Ethers to transfer per user request")
-	intervalFlag = flag.Int("faucet.minutes", 1440, "Number of minutes to wait between funding rounds")
-	netnameFlag  = flag.String("faucet.name", "testnet", "Network name to display on the frontend")
+	payoutFlag     = flag.Int("faucet.amount", 1, "Number of Ethers to transfer per user request")
+	intervalFlag   = flag.Int("faucet.minutes", 1440, "Number of minutes to wait between funding rounds")
+	netnameFlag    = flag.String("faucet.name", "testnet", "Network name to display on the frontend")
+	erc20TokenFlag = flag.String("faucet.erc20", os.Getenv("ERC20_ADDRESS"), "Provide erc20 address to reload the deployed contract when restarting the server")
 
 	keyJSONFlag  = flag.String("wallet.keyjson", os.Getenv("KEYSTORE"), "Keystore file to fund user requests with")
 	keyPassFlag  = flag.String("wallet.keypass", "password.txt", "Passphrase text file to decrypt keystore")
@@ -53,7 +54,7 @@ func Execute() {
 		chainID = big.NewInt(int64(value))
 	}
 
-	txBuilder, err := chain.NewTxBuilder(*providerFlag, privateKey, chainID)
+	txBuilder, err := chain.NewTxBuilder(*providerFlag, *erc20TokenFlag, privateKey, chainID)
 	if err != nil {
 		panic(fmt.Errorf("cannot connect to web3 provider: %w", err))
 	}

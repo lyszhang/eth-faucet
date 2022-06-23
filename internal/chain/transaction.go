@@ -31,7 +31,7 @@ type TxBuild struct {
 	token     *contract.ERC20BurnableMockSession
 }
 
-func NewTxBuilder(provider string, privateKey *ecdsa.PrivateKey, chainID *big.Int) (TxBuilder, error) {
+func NewTxBuilder(provider, erc20Token string, privateKey *ecdsa.PrivateKey, chainID *big.Int) (TxBuilder, error) {
 	client, err := ethclient.Dial(provider)
 	if err != nil {
 		return nil, err
@@ -48,12 +48,26 @@ func NewTxBuilder(provider string, privateKey *ecdsa.PrivateKey, chainID *big.In
 	if err != nil {
 		return nil, err
 	}
-	tokenAddr, tx, token, err := contract.DeployERC20BurnableMock(auth, client, "USDC coin", "USDC", auth.From, big.NewInt(0).Mul(big.NewInt(1e6), big.NewInt(1e18)))
-	if err != nil {
-		return nil, err
+
+	var (
+		tokenAddr common.Address
+		token     *contract.ERC20BurnableMock
+	)
+	if erc20Token == "" {
+		token, err = contract.NewERC20BurnableMock(common.HexToAddress(erc20Token), client)
+		if err != nil {
+			return nil, err
+		}
+		tokenAddr = common.HexToAddress(erc20Token)
+	} else {
+		var tx *types.Transaction
+		tokenAddr, tx, token, err = contract.DeployERC20BurnableMock(auth, client, "USDC coin", "USDC", auth.From, big.NewInt(0).Mul(big.NewInt(1e6), big.NewInt(1e18)))
+		if err != nil {
+			return nil, err
+		}
+		waitPendingTx(context.Background(), client, tx.Hash())
+		log.Infof("Deploy erc20 contract %s successful", tokenAddr.String())
 	}
-	waitPendingTx(context.Background(), client, tx.Hash())
-	log.Infof("Deploy erc20 contract %s successful", tokenAddr.String())
 
 	return &TxBuild{
 		client:    client,
