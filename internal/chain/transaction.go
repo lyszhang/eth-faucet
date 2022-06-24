@@ -53,12 +53,12 @@ func NewTxBuilder(provider, erc20Token string, privateKey *ecdsa.PrivateKey, cha
 		tokenAddr common.Address
 		token     *contract.ERC20BurnableMock
 	)
-	if erc20Token == "" {
-		token, err = contract.NewERC20BurnableMock(common.HexToAddress(erc20Token), client)
+	if erc20Token != "" {
+		tokenAddr = common.HexToAddress(erc20Token)
+		token, err = contract.NewERC20BurnableMock(tokenAddr, client)
 		if err != nil {
 			return nil, err
 		}
-		tokenAddr = common.HexToAddress(erc20Token)
 	} else {
 		var tx *types.Transaction
 		tokenAddr, tx, token, err = contract.DeployERC20BurnableMock(auth, client, "USDC coin", "USDC", auth.From, big.NewInt(0).Mul(big.NewInt(1e6), big.NewInt(1e18)))
