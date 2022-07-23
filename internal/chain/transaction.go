@@ -3,8 +3,8 @@ package chain
 import (
 	"context"
 	"crypto/ecdsa"
-	"fmt"
 	"math/big"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -23,8 +23,10 @@ type TxBuilder interface {
 }
 
 type TxBuild struct {
-	client  bind.ContractTransactor
 	chainID *big.Int
+	client  bind.ContractTransactor
+	nonce   uint64
+	mutex   sync.Mutex
 
 	tokenAddr common.Address
 	auth      *bind.TransactOpts
@@ -69,8 +71,14 @@ func NewTxBuilder(provider, erc20Token string, privateKey *ecdsa.PrivateKey, cha
 		log.Infof("Deploy erc20 contract %s successful", tokenAddr.String())
 	}
 
+	nonce, err := client.PendingNonceAt(context.Background(), auth.From)
+	if err != nil {
+		return nil, err
+	}
+
 	return &TxBuild{
 		client:    client,
+		nonce:     nonce,
 		auth:      auth,
 		tokenAddr: tokenAddr,
 		token: &contract.ERC20BurnableMockSession{
@@ -88,23 +96,28 @@ func (b *TxBuild) Sender() common.Address {
 }
 
 func (b *TxBuild) PackTransfer(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
-	txHash, err := b.Transfer(ctx, to, value)
-	go func() {
-		txHash, err := b.TransferERC20Token(context.Background(), to, value)
-		if err != nil {
-			fmt.Printf("send ERC20 token failed, err: %s", err.Error())
-		}
-		fmt.Println("send ERC20 tx hash: ", txHash.String())
-	}()
+	// serialize transfers because we manually increase the nonce
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	txHash, err := b.TransferERC20Token(context.Background(), to, value)
+	if err != nil {
+		log.Errorf("send ERC20 token failed, err: %v", err.Error())
+		return txHash, err
+	}
+	log.Infof("send ERC20 tx hash: %v", txHash.String())
+
+	txHash, err = b.Transfer(ctx, to, value)
+	if err != nil {
+		log.Errorf("send ether failed, err: %v", err.Error())
+		return txHash, err
+	}
+	log.Infof("send ether tx hash: %v", txHash.String())
+
 	return txHash, err
 }
 
 func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
-	nonce, err := b.client.PendingNonceAt(ctx, b.Sender())
-	if err != nil {
-		return common.Hash{}, err
-	}
-
 	gasLimit := uint64(21000)
 	gasPrice, err := b.client.SuggestGasPrice(ctx)
 	if err != nil {
@@ -113,7 +126,7 @@ func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (comm
 
 	toAddress := common.HexToAddress(to)
 	unsignedTx := types.NewTx(&types.LegacyTx{
-		Nonce:    nonce,
+		Nonce:    b.nonce,
 		To:       &toAddress,
 		Value:    value,
 		Gas:      gasLimit,
@@ -125,13 +138,22 @@ func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (comm
 		return common.Hash{}, err
 	}
 
-	return signedTx.Hash(), b.client.SendTransaction(ctx, signedTx)
+	err = b.client.SendTransaction(ctx, signedTx)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	b.nonce++
+
+	return signedTx.Hash(), nil
 }
 
 func (b *TxBuild) TransferERC20Token(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
+	// update the nonce in the bind
+	b.token.TransactOpts.Nonce = new(big.Int).SetUint64(b.nonce)
 	tx, err := b.token.Transfer(common.HexToAddress(to), big.NewInt(0).Mul(big.NewInt(100), value))
 	if err != nil {
 		return common.Hash{}, err
 	}
+	b.nonce++
 	return tx.Hash(), nil
 }

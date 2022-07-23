@@ -66,6 +66,7 @@ func (s *Server) consumeQueue() {
 	defer s.mutex.Unlock()
 	for len(s.queue) != 0 {
 		address := <-s.queue
+		log.Info("Process request in the queue, queue size: ", len(s.queue))
 		txHash, err := s.PackTransfer(context.Background(), address, chain.EtherToWei(int64(s.cfg.payout)))
 		if err != nil {
 			log.WithError(err).Error("Failed to handle transaction in the queue")
