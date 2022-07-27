@@ -2,9 +2,7 @@ package server
 
 import (
 	"fmt"
-	"net"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -43,25 +41,25 @@ func (l *Limiter) ServeHTTP(w http.ResponseWriter, r *http.Request, next http.Ha
 		return
 	}
 
-	clintIP := getClientIPFromRequest(l.proxyCount, r)
+	//clintIP := getClientIPFromRequest(l.proxyCount, r)
 	l.mutex.Lock()
-	if l.limitByKey(w, address) || l.limitByKey(w, clintIP) {
+	if l.limitByKey(w, address) {
 		l.mutex.Unlock()
 		return
 	}
 	l.cache.SetWithTTL(address, true, l.ttl)
-	l.cache.SetWithTTL(clintIP, true, l.ttl)
+	//l.cache.SetWithTTL(clintIP, true, l.ttl)
 	l.mutex.Unlock()
 
 	next.ServeHTTP(w, r)
 	if w.(negroni.ResponseWriter).Status() != http.StatusOK {
 		l.cache.Remove(address)
-		l.cache.Remove(clintIP)
+		//l.cache.Remove(clintIP)
 		return
 	}
 	log.WithFields(log.Fields{
-		"address":  address,
-		"clientIP": clintIP,
+		"address": address,
+		//"clientIP": clintIP,
 	}).Info("Maximum request limit has been reached")
 }
 
@@ -74,6 +72,7 @@ func (l *Limiter) limitByKey(w http.ResponseWriter, key string) bool {
 	return false
 }
 
+/*
 func getClientIPFromRequest(proxyCount int, r *http.Request) string {
 	if proxyCount > 0 {
 		xForwardedFor := r.Header.Get("X-Forwarded-For")
@@ -100,3 +99,4 @@ func getClientIPFromRequest(proxyCount int, r *http.Request) string {
 	}
 	return remoteIP
 }
+*/
