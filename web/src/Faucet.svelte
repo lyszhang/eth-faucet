@@ -2,20 +2,57 @@
   import { onMount } from 'svelte';
   import { getAddress } from '@ethersproject/address';
   import { setDefaults as setToast, toast } from 'bulma-toast';
-
-  let address = null;
+  import LC from 'leancloud-storage';
+  import { connected, selectedAccount, defaultEvmStores } from 'svelte-web3';
+  let address = null,
+    hasPermission = false;
   let faucetInfo = {
     account: '0x0000000000000000000000000000000000000000',
     network: 'testnet',
     payout: 1,
   };
 
+  const HAS_LOGINED = 'hasLogined';
+
+  $: if ($connected) {
+    localStorage.setItem(HAS_LOGINED, 'logined');
+  }
+
+  $: {
+    if ($selectedAccount) {
+      address = $selectedAccount;
+      const query = new LC.Query('Subscriber');
+      query.equalTo('walletAddress', address);
+      query.find().then((res) => {
+        if (res.length) {
+          hasPermission = true;
+        } else {
+          hasPermission = false;
+        }
+      });
+    } else {
+      hasPermission = false;
+    }
+  }
+
   $: document.title = `Scroll ${capitalize(faucetInfo.network)} Faucet`;
 
   onMount(async () => {
+    LC.init({
+      appId: 'hvIeDclG2pt2nzAdbKWM0qms-MdYXbMMI',
+      appKey: 'lKObgvpdxLT2JK839oxSM4Fn',
+    });
+    autoSetProviderIfLogined();
     const res = await fetch('/api/info');
     faucetInfo = await res.json();
   });
+
+  function autoSetProviderIfLogined() {
+    let hasLogined = localStorage.getItem(HAS_LOGINED);
+    if (hasLogined) {
+      defaultEvmStores.setProvider();
+    }
+  }
 
   setToast({
     position: 'bottom-center',
@@ -24,6 +61,10 @@
     closeOnClick: false,
     animate: { in: 'fadeIn', out: 'fadeOut' },
   });
+
+  function handleLoginMetamask() {
+    defaultEvmStores.setProvider();
+  }
 
   async function handleRequest() {
     try {
@@ -91,26 +132,91 @@
           <h2 class="subtitle">
             Serving from {faucetInfo.account}
           </h2>
-          <div class="box">
-            <div class="field is-grouped">
-              <p class="control is-expanded">
-                <input
-                  bind:value={address}
-                  class="input is-rounded"
-                  type="text"
-                  placeholder="Enter your address"
+
+          {#if !hasPermission}
+            <div
+              class="card w-[448px] mt-[24px] mx-auto  bg-white  py-[20px] px-[32px] shadow-md rounded "
+            >
+              <p class="font-light">
+                To prevent faucet botting, you must sign in with MetaMask.
+              </p>
+              <div
+                on:click={handleLoginMetamask}
+                class="{$selectedAccount
+                  ? 'cursor-not-allowed  opacity-50'
+                  : 'cursor-pointer hover:shadow-md'} w-full  py-[16px] px-[24px] flex justify-center items-center rounded border  my-[20px]"
+              >
+                <img
+                  alt="metamask logo"
+                  class="w-[60px]"
+                  src="/metamask-fox.png"
                 />
-              </p>
-              <p class="control">
-                <button
-                  on:click={handleRequest}
-                  class="button is-primary is-rounded"
+                <div class="ml-[16px]">
+                  <p class="text-[18px] font-bold">MetaMask</p>
+                  <p class="text-[16px] font-light mt-[6px]">
+                    Connect using browser wallet
+                  </p>
+                </div>
+              </div>
+
+              {#if $selectedAccount}
+                <div class="relative py-[12px]">
+                  <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-b border-gray-300" />
+                  </div>
+                  <div class="relative flex justify-center top-[-2px]">
+                    <span
+                      class="bg-white px-[12px] text-sm text-gray-500 text-[16px] "
+                    >
+                      no permission, need to sign up
+                    </span>
+                  </div>
+                </div>
+                <a
+                  href="https://signup.scroll.io/"
+                  class="cursor-pointer py-[10px] px-[16px] font-bold rounded border w-[100px] mx-auto mb-[16px] block"
                 >
-                  Request
-                </button>
+                  Sign Up
+                </a>
+              {/if}
+
+              <p class=" text-center font-light text-[#595959]">
+                And join our communities
               </p>
+              <div class="flex justify-center mt-[10px]">
+                <a class="mx-[10px]" href="https://twitter.com/Scroll_ZKP">
+                  <img src="/twitter.png" alt="twitter logo" class="h-20px" />
+                </a>
+                <a class="mx-[10px]" href="https://discord.gg/CNzNVt4Feu">
+                  <img src="/discord.png" alt="discord logo" class="h-20px" />
+                </a>
+                <a class="mx-[10px]" href="https://github.com/scroll-tech">
+                  <img src="/github.png" alt="github logo" class="h-20px" />
+                </a>
+              </div>
             </div>
-          </div>
+          {:else}
+            <div class="box">
+              <div class="field is-grouped">
+                <p class="control is-expanded">
+                  <input
+                    bind:value={address}
+                    class="input is-rounded"
+                    type="text"
+                    placeholder="Enter your address"
+                  />
+                </p>
+                <p class="control">
+                  <button
+                    on:click={handleRequest}
+                    class="button is-primary is-rounded"
+                  >
+                    Request
+                  </button>
+                </p>
+              </div>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
