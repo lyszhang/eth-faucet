@@ -25,6 +25,9 @@
     "animate.css": "^4.1.1",
     "bulma": "^0.9.3",
     "bulma-toast": "^2.4.1",
-    "sirv-cli": "^2.0.0"
+    "leancloud-storage": "^4.13.1",
+    "sirv-cli": "^2.0.0",
+    "svelte-web3": "^3.5.0",
+    "svelte-windicss-preprocess": "^4.2.8"
   }
 }
