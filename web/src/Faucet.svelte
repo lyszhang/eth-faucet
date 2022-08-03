@@ -101,7 +101,7 @@
           <div class="navbar-brand">
             <a
               class="navbar-item !hover:bg-transparent "
-              href="https://enter.scroll.io/"
+              href="https://prealpha.scroll.io"
             >
               <img src="/logo.png" alt="logo" class="h-30px" />
             </a>
