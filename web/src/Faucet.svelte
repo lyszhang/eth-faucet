@@ -228,7 +228,4 @@
     padding: 3rem 0;
     line-height: 1.5;
   }
-  .box {
-    border-radius: 19px;
-  }
 </style>
