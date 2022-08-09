@@ -2,6 +2,7 @@
   import 'animate.css';
   import 'bulma/css/bulma.css';
   import Faucet from './Faucet.svelte';
+  import Header from './Header.svelte';
 </script>
 
 <svelte:head>
@@ -10,6 +11,7 @@
     rel="stylesheet"
   />
 </svelte:head>
+<Header />
 
 <Faucet />
 

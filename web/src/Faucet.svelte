@@ -94,50 +94,10 @@
 </script>
 
 <main>
-  <section class="hero is-info is-fullheight">
-    <div class="hero-head">
-      <nav class="navbar">
-        <div class="container">
-          <div class="navbar-brand">
-            <a
-              class="navbar-item !hover:bg-transparent "
-              href="https://prealpha.scroll.io"
-            >
-              <img src="/logo.png" alt="logo" class="h-30px" />
-            </a>
-            <a class="navbar-item !pl-0 !hover:bg-transparent " href=".">
-              <span><b>Scroll Faucet</b></span>
-            </a>
-          </div>
-          <div id="navbarMenu" class="navbar-menu">
-            <div class="navbar-end">
-              <span class="navbar-item">
-                <a
-                  class="button is-white is-outlined"
-                  href="https://github.com/scroll-dev/eth-faucet"
-                >
-                  <span class="icon">
-                    <i class="fa fa-github" />
-                  </span>
-                  <span>View Source</span>
-                </a>
-              </span>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </div>
-
+  <section class="hero  is-fullheight bg-[#f6f7f8]">
     <div class="hero-body">
       <div class="container has-text-centered">
         <div class="column is-6 is-offset-3">
-          <h1 class="title">
-            Receive {faucetInfo.payout} ETH & 100 USDC per request
-          </h1>
-          <h2 class="subtitle">
-            Serving from {faucetInfo.account}
-          </h2>
-
           {#if !hasPermission}
             <div
               class="card w-[448px] mt-[24px] mx-auto  bg-white  py-[20px] px-[32px] shadow-md rounded "
@@ -173,26 +133,26 @@
                     <span
                       class="bg-white px-[12px] text-sm text-gray-500 text-[16px] "
                     >
-                      no permission, need to sign up
+                      Signup for waitlist
                     </span>
                   </div>
                 </div>
                 <a
                   href="https://signup.scroll.io/"
-                  class="cursor-pointer py-[10px] px-[16px] font-bold rounded border w-[100px] mx-auto mb-[16px] block"
+                  class="button my-[8px]  rounded-md px-[16px] py-[8px] text-[16px] bg-indigo-100 text-indigo-500  !border-none hover:(bg-indigo-100 text-indigo-500 opacity-80)"
                 >
                   Sign Up
                 </a>
               {/if}
 
               <p class=" text-center font-light text-[#595959]">
-                And join our communities
+                Connect with us!
               </p>
               <div class="flex justify-center mt-[10px]">
                 <a class="mx-[10px]" href="https://twitter.com/Scroll_ZKP">
                   <img src="/twitter.png" alt="twitter logo" class="h-20px" />
                 </a>
-                <a class="mx-[10px]" href="https://discord.gg/CNzNVt4Feu">
+                <a class="mx-[10px]" href="https://discord.gg/s84eJSdFhn">
                   <img src="/discord.png" alt="discord logo" class="h-20px" />
                 </a>
                 <a class="mx-[10px]" href="https://github.com/scroll-tech">
@@ -201,31 +161,24 @@
               </div>
             </div>
           {:else}
-            <p class="control">
-              <button
-                on:click={handleRequest}
-                class="button is-primary  text-[20px]"
-              >
-                Request
-              </button>
-            </p>
+            <div
+              class="card  mx-auto  bg-white  py-[60px] px-[32px] shadow-md rounded "
+            >
+              <h1 class="title">
+                Request {faucetInfo.payout} ETH & 100 USDC
+              </h1>
+              <p class="control">
+                <button
+                  on:click={handleRequest}
+                  class="button  rounded-md px-[16px] py-[8px] text-[20px] bg-indigo-100 text-indigo-500  !border-none hover:(bg-indigo-100 text-indigo-500 opacity-80)"
+                >
+                  Request
+                </button>
+              </p>
+            </div>
           {/if}
         </div>
       </div>
     </div>
   </section>
 </main>
-
-<style>
-  .hero.is-info {
-    background: #3f3238;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-  }
-  .hero .subtitle {
-    padding: 3rem 0;
-    line-height: 1.5;
-  }
-</style>
