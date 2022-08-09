@@ -137,6 +137,10 @@
           <h2 class="subtitle">
             Serving from {faucetInfo.account}
           </h2>
+          <h3>
+            Note: Make sure your wallet is on the correct network when checking
+            your account balance.
+          </h3>
 
           {#if !hasPermission}
             <div
