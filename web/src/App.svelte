@@ -11,9 +11,12 @@
     rel="stylesheet"
   />
 </svelte:head>
+<svelte:body />
 <Header />
-
 <Faucet />
 
 <style windi:preflights:global windi:safelist:global>
+  :global(body) {
+    background: #f6f7f8;
+  }
 </style>

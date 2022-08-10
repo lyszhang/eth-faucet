@@ -94,8 +94,8 @@
 </script>
 
 <main>
-  <section class="hero  is-fullheight bg-[#f6f7f8]">
-    <div class="hero-body">
+  <section class="hero  h-[calc(100vh-110px)] flex justify-center align-middle">
+    <div class="mt-[-10vh]">
       <div class="container has-text-centered">
         <div class="column is-6 is-offset-3">
           {#if !hasPermission}
@@ -164,7 +164,7 @@
             <div
               class="card  mx-auto  bg-white  py-[60px] px-[32px] shadow-md rounded "
             >
-              <h1 class="title">
+              <h1 class="title !mb-50px text-[26px] xl:text-[32px]">
                 Request {faucetInfo.payout} ETH & 100 USDC
               </h1>
               <p class="control">

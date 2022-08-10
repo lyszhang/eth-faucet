@@ -115,7 +115,7 @@
             <a
               target={tab.isExternal ? '_blank' : '_self'}
               href={tab.link}
-              class={` inline-block px-[16px]  py-[8px] text-[18px] font-normal text-gray-800 no-underline rounded-md  hover:text-indigo-500 focus:text-indigo-500  focus:outline-none ${
+              class={` inline-block px-[8px]  py-[8px] text-[18px] font-normal text-gray-800 no-underline rounded-md   xl:px-4 hover:text-indigo-500 focus:text-indigo-500  focus:outline-none ${
                 tab.isActive ? 'bg-indigo-100 text-indigo-500' : ''
               } `}
             >
