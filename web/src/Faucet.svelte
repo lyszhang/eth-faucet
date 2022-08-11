@@ -139,7 +139,7 @@
                 </div>
                 <a
                   href="https://signup.scroll.io/"
-                  class="button my-[8px]  rounded-md px-[16px] py-[8px] text-[16px] bg-indigo-100 text-indigo-500  !border-none hover:(bg-indigo-100 text-indigo-500 opacity-80)"
+                  class="button my-[8px]  rounded-md px-[16px] py-[8px] text-[16px] bg-indigo-100  text-indigo-500  !border-none focus:text-white hover:(bg-indigo-100 text-indigo-500 opacity-80)"
                 >
                   Sign Up
                 </a>
@@ -170,7 +170,7 @@
               <p class="control">
                 <button
                   on:click={handleRequest}
-                  class="button  rounded-md px-[16px] py-[8px] text-[20px] bg-indigo-100 text-indigo-500  !border-none hover:(bg-indigo-100 text-indigo-500 opacity-80)"
+                  class="button  rounded-md px-[16px] py-[8px] text-[20px] bg-indigo-100 text-indigo-500  !border-none focus:text-white hover:(bg-indigo-100 text-indigo-500 opacity-80)"
                 >
                   Request
                 </button>
