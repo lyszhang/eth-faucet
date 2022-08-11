@@ -98,6 +98,17 @@
     <div class="mt-[-10vh]">
       <div class="container has-text-centered">
         <div class="column is-6 is-offset-3">
+          <h1 class="title">
+            Receive {faucetInfo.payout} ETH & 100 USDC per request
+          </h1>
+          <h2 class="subtitle">
+            Serving from {faucetInfo.account}
+          </h2>
+          <h3>
+            Note: Make sure your wallet is on the correct network when checking
+            your account balance.
+          </h3>
+
           {#if !hasPermission}
             <div
               class="card w-full mt-[24px] mx-auto  bg-white  py-[40px] px-[32px] shadow-md rounded "
