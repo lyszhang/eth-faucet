@@ -165,7 +165,7 @@
               class="card  mx-auto  bg-white  py-[60px] px-[32px] shadow-md rounded "
             >
               <h1 class="title !mb-50px text-[26px] xl:text-[32px]">
-                Request {faucetInfo.payout} ETH & 100 USDC
+                Request {faucetInfo.payout} ETH & 100 USDC on Scroll L1
               </h1>
               <p class="control">
                 <button
