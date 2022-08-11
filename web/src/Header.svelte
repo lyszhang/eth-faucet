@@ -54,7 +54,7 @@
   }
 </script>
 
-<div class="w-full">
+<div class="w-full bg-white">
   <nav
     class="container relative flex flex-wrap items-center justify-between p-8 mx-auto lg:justify-between xl:px-0"
   >
@@ -63,15 +63,13 @@
         href="https://prealpha.scroll.io/"
         class="flex items-center space-x-2 text-2xl font-medium text-gray-800 dark:text-gray-100"
       >
-        <span>
-          <img
-            src="https://scroll.io/img/logo_with_text.ff8e8db3.png"
-            alt="logo"
-            width={96}
-            height={39}
-            class="cursor-pointer"
-          />
-        </span>
+        <img
+          src="https://scroll.io/img/logo_with_text.png"
+          alt="logo"
+          width={96}
+          height={39}
+          class="cursor-pointer"
+        />
       </a>
       <svg
         class="w-6 h-6 fill-curren lg:hidden"
@@ -115,14 +113,13 @@
             <a
               target={tab.isExternal ? '_blank' : '_self'}
               href={tab.link}
-              class={` inline-block px-[8px]  py-[8px] text-[18px] font-normal text-gray-800 no-underline rounded-md   xl:px-4 hover:text-indigo-500 focus:text-indigo-500  focus:outline-none ${
+              class={`flex inline-block px-[8px]  py-[8px] text-lg font-normal text-gray-800 no-underline rounded-md  hover:text-indigo-500 focus:text-indigo-500  focus:outline-none xl:px-[16px] ${
                 tab.isActive ? 'bg-indigo-100 text-indigo-500' : ''
-              } `}
+              }`}
             >
-              {tab.name}{' '}
-              {#if tab.isExternal}
+              {tab.name}{#if tab.isExternal}
                 <svg
-                  class="align-text-bottom w-[24px] h-[24px] inline-block fill-current"
+                  class="align-text-bottom w-[27px] h-[27px] inline-block fill-current"
                   focusable="false"
                   aria-hidden="true"
                   viewBox="0 0 24 24"
@@ -187,34 +184,12 @@
     -webkit-appearance: button;
     font: inherit;
   }
-  [type='search'] {
-    -webkit-appearance: textfield;
-    outline-offset: -2px;
-  }
-  abbr[title] {
-    -webkit-text-decoration: underline dotted;
-    text-decoration: underline dotted;
-  }
   a {
     color: inherit;
     text-decoration: inherit;
   }
-  body {
-    margin: 0;
-    font-family: inherit;
-    line-height: inherit;
-  }
-  html {
-    -webkit-text-size-adjust: 100%;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-      'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-      'Noto Color Emoji';
-    line-height: 1.5;
-  }
   svg {
     display: block;
-    vertical-align: middle;
   }
   ul {
     list-style: none;
