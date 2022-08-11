@@ -18,5 +18,8 @@
 <style windi:preflights:global windi:safelist:global>
   :global(body) {
     background: #f6f7f8;
+    font-family: 'TT Norms' !important;
+    letter-spacing: normal;
+    -webkit-font-smoothing: initial;
   }
 </style>
