@@ -109,7 +109,7 @@
                 on:click={handleLoginMetamask}
                 class="{$selectedAccount
                   ? 'cursor-not-allowed  opacity-50'
-                  : 'cursor-pointer hover:shadow-md'} w-full w-max-[360px] mx-auto  py-[16px] px-[24px] flex justify-center items-center rounded border  my-[20px]"
+                  : 'cursor-pointer hover:shadow-md'} w-full max-w-[360px] mx-auto  py-[16px] px-[24px] flex justify-center items-center rounded border  my-[20px]"
               >
                 <img
                   alt="metamask logo"
