@@ -43,7 +43,10 @@
   }
   :global(body) {
     background: #f6f7f8;
-    font-family: 'TT Norms' !important;
+    font-family: 'TT Norms', ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+      'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+      'Segoe UI Symbol', 'Noto Color Emoji' !important;
     letter-spacing: normal;
     -webkit-font-smoothing: initial;
   }
