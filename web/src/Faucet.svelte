@@ -100,7 +100,7 @@
         <div class="column is-6 is-offset-3">
           {#if !hasPermission}
             <div
-              class="card w-[448px] mt-[24px] mx-auto  bg-white  py-[20px] px-[32px] shadow-md rounded "
+              class="card w-full mt-[24px] mx-auto  bg-white  py-[40px] px-[32px] shadow-md rounded "
             >
               <p class="font-light">
                 To prevent faucet botting, you must sign in with MetaMask.
@@ -109,7 +109,7 @@
                 on:click={handleLoginMetamask}
                 class="{$selectedAccount
                   ? 'cursor-not-allowed  opacity-50'
-                  : 'cursor-pointer hover:shadow-md'} w-full  py-[16px] px-[24px] flex justify-center items-center rounded border  my-[20px]"
+                  : 'cursor-pointer hover:shadow-md'} w-full w-max-[360px] mx-auto  py-[16px] px-[24px] flex justify-center items-center rounded border  my-[20px]"
               >
                 <img
                   alt="metamask logo"

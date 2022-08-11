@@ -16,6 +16,31 @@
 <Faucet />
 
 <style windi:preflights:global windi:safelist:global>
+  /* windicss(hmr:1:all-modules) */
+  /* windicss layer base */
+  @font-face {
+    font-family: 'TT Norms';
+    src: url('/fonts/TTNorms-Bold.woff2'), url('/fonts/TTNorms-Bold.ttf'),
+      url('/fonts/TTNorms-Bold.otf');
+    font-style: normal;
+    font-weight: bold;
+  }
+
+  @font-face {
+    font-family: 'TT Norms';
+    src: url('/fonts/TTNorms-Regular.woff2'), url('/fonts/TTNorms-Regular.ttf'),
+      url('/fonts/TTNorms-Regular.otf');
+    font-style: normal;
+    font-weight: normal;
+  }
+
+  @font-face {
+    font-family: 'TT Norms';
+    src: url('/fonts/TTNorms-Medium.woff2'), url('/fonts/TTNorms-Medium.ttf'),
+      url('/fonts/TTNorms-Medium.otf');
+    font-style: normal;
+    font-weight: 500;
+  }
   :global(body) {
     background: #f6f7f8;
     font-family: 'TT Norms' !important;
