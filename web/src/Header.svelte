@@ -96,11 +96,11 @@
             <a
               target={tab.isExternal ? '_blank' : '_self'}
               href={tab.link}
-              class={`w-full px-2  py-2 -ml-4 text-gray-500 rounded-md hover:text-indigo-500 focus:text-indigo-500 focus:bg-indigo-100 focus:outline-none  ${
+              class={`w-full flex items-center px-2  py-2 -ml-4 text-gray-500 rounded-md hover:text-indigo-500 focus:text-indigo-500 focus:bg-indigo-100 focus:outline-none  ${
                 tab.isActive ? 'bg-indigo-100 text-indigo-500' : ''
               } xl:px-4`}
             >
-              {tab.name}{' '}
+              {tab.name}
               {#if tab.isExternal}
                 <svg
                   class="align-text-bottom w-[20px] h-[20px] inline-block fill-current"
