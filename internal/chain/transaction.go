@@ -15,9 +15,14 @@ import (
 	"github.com/scroll-dev/eth-faucet/internal/chain/contract"
 )
 
+const (
+	EtherTx int = iota
+	ERC20Tx
+)
+
 type TxBuilder interface {
 	Sender() common.Address
-	PackTransfer(ctx context.Context, to string, value *big.Int) (common.Hash, error)
+	PackTransfer(ctx context.Context, to string, value *big.Int) (map[int]common.Hash, error)
 	Transfer(ctx context.Context, to string, value *big.Int) (common.Hash, error)
 	TransferERC20Token(ctx context.Context, to string, value *big.Int) (common.Hash, error)
 }
@@ -95,26 +100,29 @@ func (b *TxBuild) Sender() common.Address {
 	return b.auth.From
 }
 
-func (b *TxBuild) PackTransfer(ctx context.Context, to string, value *big.Int) (common.Hash, error) {
+func (b *TxBuild) PackTransfer(ctx context.Context, to string, value *big.Int) (map[int]common.Hash, error) {
 	// serialize transfers because we manually increase the nonce
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
-	txHash, err := b.TransferERC20Token(context.Background(), to, value)
+	erc20Hash, err := b.TransferERC20Token(context.Background(), to, value)
 	if err != nil {
 		log.Errorf("send ERC20 token failed, err: %v", err.Error())
-		return txHash, err
+		return nil, err
 	}
-	log.Infof("send ERC20 tx hash: %v", txHash.String())
+	log.Infof("send ERC20 tx hash: %v", erc20Hash.String())
 
-	txHash, err = b.Transfer(ctx, to, value)
+	ethHash, err := b.Transfer(ctx, to, value)
 	if err != nil {
 		log.Errorf("send ether failed, err: %v", err.Error())
-		return txHash, err
+		return nil, err
 	}
-	log.Infof("send ether tx hash: %v", txHash.String())
+	log.Infof("send ether tx hash: %v", ethHash.String())
 
-	return txHash, err
+	return map[int]common.Hash{
+		ERC20Tx: erc20Hash,
+		EtherTx: ethHash,
+	}, err
 }
 
 func (b *TxBuild) Transfer(ctx context.Context, to string, value *big.Int) (common.Hash, error) {

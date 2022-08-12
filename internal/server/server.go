@@ -72,8 +72,9 @@ func (s *Server) consumeQueue() {
 			log.WithError(err).Error("Failed to handle transaction in the queue")
 		} else {
 			log.WithFields(log.Fields{
-				"txHash":  txHash,
-				"address": address,
+				"txHash":    txHash[chain.EtherTx],
+				"erc20Hash": txHash[chain.ERC20Tx],
+				"address":   address,
 			}).Info("Consume from queue successfully")
 		}
 	}
@@ -114,10 +115,12 @@ func (s *Server) handleClaim() http.HandlerFunc {
 		}
 
 		log.WithFields(log.Fields{
-			"txHash":  txHash,
-			"address": address,
+			"txHash":    txHash[chain.EtherTx],
+			"erc20Hash": txHash[chain.ERC20Tx],
+			"address":   address,
 		}).Info("Funded directly successfully")
-		fmt.Fprintf(w, "Txhash: %s", txHash)
+		fmt.Fprintf(w, "ETH Tx Hash: %s<br>USDC Tx Hash: %s",
+			txHash[chain.EtherTx], txHash[chain.ERC20Tx])
 	}
 }
 

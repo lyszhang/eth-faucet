@@ -61,6 +61,7 @@
     dismissible: true,
     pauseOnHover: true,
     closeOnClick: false,
+    duration: 4000,
     animate: { in: 'fadeIn', out: 'fadeOut' },
   });
 

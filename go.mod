@@ -9,6 +9,5 @@ require (
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tidwall/gjson v1.14.0
 	github.com/urfave/negroni v1.0.0
 )
