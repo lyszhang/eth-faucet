@@ -12,6 +12,8 @@
     payout: 1,
   };
 
+  const L1_SCAN_URL = 'https://l1scan.scroll.io';
+
   const HAS_LOGINED = 'hasLogined';
 
   $: if ($connected) {
@@ -83,8 +85,18 @@
       method: 'POST',
       body: formData,
     });
-    let message = await res.text();
+    let message;
     let type = res.ok ? 'is-success' : 'is-warning';
+    if (res.ok) {
+      let data = await res.json();
+      message = `<div>
+        ETH Tx Hash: <a href="${L1_SCAN_URL}/tx/${data.eth_tx_hash}" target="_blank">${data.eth_tx_hash}</a> 
+        USDC Tx Hash: <a href="${L1_SCAN_URL}/tx/${data.erc20_tx_hash}" target="_blank">${data.erc20_tx_hash}</a> 
+        </div>`;
+    } else {
+      message = await res.text();
+    }
+
     toast({ message, type });
   }
 
