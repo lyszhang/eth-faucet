@@ -119,8 +119,19 @@ func (s *Server) handleClaim() http.HandlerFunc {
 			"erc20Hash": txHash[chain.ERC20Tx],
 			"address":   address,
 		}).Info("Funded directly successfully")
-		fmt.Fprintf(w, "ETH Tx Hash: %s<br>USDC Tx Hash: %s",
-			txHash[chain.EtherTx], txHash[chain.ERC20Tx])
+
+		result := struct {
+			EthTxHash   string `json:"eth_tx_hash"`
+			Erc20TxHash string `json:"erc20_tx_hash"`
+			Address     string `json:"address"`
+		}{
+			EthTxHash:   txHash[chain.EtherTx].String(),
+			Erc20TxHash: txHash[chain.ERC20Tx].String(),
+			Address:     address,
+		}
+
+		data, _ := json.Marshal(result)
+		fmt.Fprintf(w, string(data))
 	}
 }
 
